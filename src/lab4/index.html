@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="uk">
+
+<head>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Teachinder</title>
+
+</head>
+
+<body>
+  <div id="toast" class="toast"></div>
+
+  <div class="container">
+
+    <header class="header">
+
+      <div class="header-left">
+
+        <div class="logo">Teachinder</div>
+
+        <nav class="nav">
+
+          <a href="#teachers">Teachers</a>
+
+          <a href="#teacherTable">Statistics</a>
+
+          <a href="#favorites">Favorites</a>
+
+          <a href="#">About</a>
+
+        </nav>
+
+      </div>
+
+      
+
+      <div class="header-right">
+
+        <div class="search-group">
+            <input type="text" id="cardSearchInput" placeholder="Name, note or age to search">
+            <button class="btn" id="cardSearchBtn">Search</button>
+        </div>
+
+        <button class="btn btn-add" id="openAdd">Add teacher</button>
+
+        <!-- Модалка для додавання вчителя -->
+<div class="modal-overlay" id="addTeacherModal">
+  <div class="add-teacher-modal">
+    <div class="modal-header">
+      <h3>Add Teacher</h3>
+      <button class="close-modal" id="closeAddModal">&times;</button>
+    </div>
+    <form id="addTeacherForm">
+      <div class="modal-body">
+        <div class="right">
+          <input type="text" name="full_name" placeholder="Name" required>
+          <select name="course" required>
+            <option value="">Select speciality</option>
+            <option>Mathematics</option>
+            <option>English</option>
+            <option>History</option>
+            <option>Physics</option>
+            <option>Computer Science</option>
+            <option>Dancing</option>
+            <option>Chess</option>
+            <option>Chemistry</option>
+            <option>Law</option>
+            <option>Art</option>
+            <option>Medicine</option>
+            <option>Statistics</option>
+          </select>
+          <div style="display:flex; gap:10px;">
+            <input type="country" name="country" placeholder="Country" required>
+            </select>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="tel" name="phone" placeholder="Phone">
+          </div>
+          <input type="date" name="age" required>
+<div class="gender-group">
+  <span>Sex:</span>
+  <label><input type="radio" name="gender" value="Male" required> Male</label>
+  <label><input type="radio" name="gender" value="Female" required> Female</label>
+</div>
+
+          <label>Background color: <input type="color" name="bgcolor" value="#ffffff"></label>
+          <textarea name="note" placeholder="Notes (optional)"></textarea>
+        </div>
+      </div>
+      <div style="text-align:center; padding:20px;">
+        <button type="submit" class="btn btn-add">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+      </div>
+
+    </header>
+
+
+
+    <main>
+
+      <section class="teachers" id="teachers">
+
+        <h2>Top Teachers</h2>
+
+        <div class="filters">
+
+          <select id="filterAge"></select>
+
+            <div class="dot-separator">
+
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+
+            </div>
+
+          <select id="filterCountry"></select>
+
+            <div class="dot-separator">
+
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+
+            </div>
+
+          <select id="filterGender"></select>
+
+            <div class="dot-separator">
+
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+
+            </div>
+
+          <label><input type="checkbox"> Only with photo</label>
+
+              <div class="dot-separator">
+
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+
+            </div>
+
+  <label>
+    <input type="checkbox" id="filterFavorite">
+    Favorites
+  </label>
+
+        </div>
+
+        <div class="teacher-list"></div>
+<div class="moreload">
+  <button class="btn" id="loadMoreBtn">Далі</button>
+</div>
+      </section>
+
+      <section class="statistics" id="teacherTable">
+
+        <h2>Statistics</h2>
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+    <th data-field="full_name">Name</th>
+    <th data-field="age">Age</th>
+    <th data-field="country">Nationality</th>
+    <th data-field="gender">Gender</th>
+    <th data-field="course">Speciality</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="tableBody"></tbody>
+
+          </table>
+
+          <div class="pagination">
+
+          <button id="prevBtn">Prev</button>
+
+          <span id="pageInfo"></span>
+
+          <button id="nextBtn">Next</button>
+
+  </div>
+
+        </div>
+
+      </section>
+
+
+
+      <section class="favorites" id="favorites">
+
+<h2>Favorites</h2>
+
+  <div class="favorites-wrapper">
+
+    <button class="scroll-btn left-btn"></button>
+
+    <div class="favorites-list"></div>
+
+            <button class="scroll-btn right-btn"></button>
+
+          </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+
+    <footer class="footer">
+
+      <nav>
+
+        <a href="#">Teachers</a>
+
+        <a href="#">Statistics</a>
+
+        <a href="#">Favorites</a>
+
+        <a href="#">About</a>
+
+      </nav>
+
+      <button class="btn btn-add" id="openAddFooter">Add teacher</button>
+
+    </footer>
+
+  </div>
+
+
+
+  <!-- тічер інфо -->
+
+ <div class="modal-overlay" id="modalInfo">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h3>Teacher Info</h3>
+
+      <button class="close-modal">&times;</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="left">
+
+        <div class="photo"></div> <!-- аби фотку показувало-->
+
+      </div>
+
+      <div class="right">
+
+        <h2 class="name" id="infoName">Teacher Name</h2>
+
+        <div class="spec" id="infoSpeciality">Speciality</div>
+
+        <div class="country" id="infoCountry">Country</div>
+
+        <div class="meta" id="infoMeta">Age, Gender</div>
+
+        <div class="contacts">
+
+          <div id="infoEmail"></div>
+
+          <div id="infoPhone"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="desc" id="infoDesc">
+
+      Teacher description goes here.
+
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module" src="./helpers.js"></script>
+<!-- <script type="module" src="./scriptss.js"></script> -->
+<script type="module" src="./scripts.js"></script> 
+<!-- <script type="module" src="./teachercard.js"></script> -->
+
+</body>
+
+
+</html>

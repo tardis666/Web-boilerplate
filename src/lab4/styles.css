@@ -1,0 +1,650 @@
+html {
+  scroll-behavior: smooth;
+}
+
+
+/* add-teacher-modal */
+.add-teacher-modal .modal-body .right input,
+.add-teacher-modal .modal-body .right select,
+.add-teacher-modal .modal-body .right textarea {
+  padding: 8px;
+  color: #000000;
+  margin-bottom: 12px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.add-teacher-modal button.btn-add {
+  background-color: #ffffff;
+  color: #d9534f;
+  font-size: 18px;
+  width: 150px;
+  height: 45px;
+  border-radius: 6px;
+}
+
+.add-teacher-modal button.btn-add:hover {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.add-teacher-modal {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  opacity: 1;
+}
+
+
+.add-teacher-modal .modal-body .right>* {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.add-teacher-modal .modal-body .right>div {
+  display: flex;
+  gap: 10px;
+}
+
+.add-teacher-modal .modal-body .right>div>* {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+
+
+
+/* заголовки таблиці */
+.statistics th {
+  padding: 10px;
+  text-align: center;
+  border: none;
+  font-weight: bold;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+/* hover */
+.statistics th:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+  color: #d9534f;
+}
+
+/* активний (обраний) стовпець */
+.statistics th.sorted {
+  background-color: #d9534f33;
+  color: #d9534f;
+}
+
+/* тост */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #d9534f;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+
+
+body {
+  font-family: sans-serif, Arial;
+  margin: 0;
+  background: #f0f0f0;
+  color: #333;
+}
+
+
+
+/* довбаний контейнер */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px 40px;
+}
+
+.logo {
+  font-size: 38px;
+  font-weight: bold;
+  color: white;
+  font-family: Bebas Neue;
+  -webkit-text-stroke: 0;
+  text-shadow:
+    2px 0 0 black,
+    -1.5px 0 0 #d9534f,
+    0 -1.5px 0 #d9534f,
+    0 0 2px black;
+}
+
+.nav a {
+  display: left;
+  font-size: 18px;
+  margin: 0 10px;
+  text-decoration: none;
+  color: #d9534f;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: flex-end;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.search-group {
+  display: flex;
+  gap: 10px;
+}
+
+.search-group input {
+  width: 180px;
+}
+
+.btn {
+  border: 1px solid #d9534f;
+  background: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #d9534f;
+  color: #fff;
+}
+
+.btn-add {
+  font-weight: bold;
+  color: #d9534f;
+  width: 150px;
+  height: 50px;
+  font-size: 18px;
+}
+
+main {
+  padding: 20px 0;
+}
+
+h2 {
+  position: relative;
+  text-align: center;
+  margin: 30px 0 30px;
+  /* відступ зверху і знизу */
+  padding: 0;
+}
+
+
+
+h2::before {
+  content: "";
+  display: block;
+  width: 500px;
+  height: 1px;
+  background-color: black;
+  margin: 0 auto 30px;
+}
+
+.filters {
+  display: flex;
+  gap: 0;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.filters input[type="checkbox"] {
+  /* стиль чекбоксів */
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #d9534f;
+}
+
+.filters label {
+  /* стиль текста аби ровнінько */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+
+.filters select {
+  padding: 3px 6px;
+  border: 1px solid black;
+  background: #fff;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.teacher-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.moreload {
+  text-align: center;
+  margin: 20px 0;
+}
+
+#loadMoreBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.teacher-card {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #111;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.teacher-card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #f5a5a5;
+  object-fit: cover;
+}
+
+.circle {
+  width: 120px;
+  height: 120px;
+  border: 3px solid #f5a5a5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  margin: auto;
+}
+
+.statistics table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.statistics th,
+.statistics td {
+  padding: 8px;
+  text-align: center;
+  border: none;
+}
+
+.statistics tbody tr:nth-child(even) {
+  background-color: #F8F8FF;
+}
+
+.statistics thead tr {
+  border-bottom: 1px solid black;
+  /* чорна полоска на низ */
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-top: 1px solid #ddd;
+  margin-top: 40px;
+}
+
+.footer a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #d9534f;
+}
+
+.dot-separator {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 40px;
+  /* висота лінії з крапок */
+  margin: 0 12px;
+  /* відстань від фільтрів */
+}
+
+.dot-separator span {
+  /* їх візуal налаштування */
+  display: block;
+  width: 2px;
+  height: 2px;
+  background-color: #ccc;
+  border-radius: 50%;
+}
+
+/* пагінация пошла шобе можна було клацать сторінки */
+
+.pagination button {
+  -webkit-appearance: none;
+  /* Safari/Chrome */
+  -moz-appearance: none;
+  /* Firefox */
+  appearance: none;
+  /* сучасні браузери */
+  border: 1px solid #333;
+  background: #fff;
+  cursor: pointer;
+  padding: 6px 12px;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.favorites-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.favorites-list {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 20px;
+  padding: 10px 0;
+  flex: 1;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scroll-btn {
+  border: none;
+  /* - рамку */
+  background: none;
+  /* - фон */
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  /* - внутрішні відступи */
+  outline: none;
+  /* - контур при фокусі */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left-btn::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-right: 20px solid #333;
+}
+
+.right-btn::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 20px solid #333;
+}
+
+.teacher-card {
+  /* вирівнює фото і текст по центру */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.teacher-card .star {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 25px;
+  color: gold;
+  font-weight: bold;
+}
+
+/* Ім’я */
+.teacher-card p strong {
+  display: block;
+  line-height: 1.3;
+  font-family: montserrat;
+  font-size: 18px;
+  color: #111;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* відступи в картках */
+.teacher-card p {
+  margin: 0;
+  line-height: 2.2;
+}
+
+/* Спеціальність */
+.teacher-card p .spec {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  font-weight: normal;
+  font-family: montserrat;
+  display: block;
+  text-align: center;
+}
+
+/* Країна */
+.teacher-card p .country {
+  display: block;
+  font-size: 9px;
+  color: #999;
+  font-family: montserrat;
+  display: block;
+  text-align: center;
+}
+
+.teacher-card .fname,
+.teacher-card .lname {
+  display: block;
+  /* кожен окремо в новий рядок */
+}
+
+/* ---------- попапи(( ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #000;
+  color: #fff;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-header .close-modal {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.modal-body {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.modal-body .left {
+  flex: 0 0 150px;
+}
+
+.modal-body .photo {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.modal-body .right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-body .name {
+  font-size: 32px;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 10px !important;
+  text-align: left !important;
+  font-family: montserrat;
+  color: #000;
+}
+
+.modal-body .spec {
+  color: black;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-body .country,
+.modal-body .meta {
+  font-size: 14px;
+  margin-top: 9px !important;
+  color: #666;
+}
+
+.modal-body .contacts {
+  font-size: 14px;
+  color: #2a7bbf;
+}
+
+/* шобе ці відступи були */
+.modal-body .contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  /* між милом і мобвілой */
+  margin-top: 9px !important;
+  align-items: flex-start;
+}
+
+/* примус відступ для дочірніх */
+.modal-body .contacts>* {
+  margin: 0 !important;
+  /* відступ знизу */
+  margin-top: 9px !important;
+}
+
+.modal .desc {
+  padding: 20px;
+  font-size: 14px;
+  font-family: montserrat;
+  color: #333;
+  line-height: 1.5;
+  border-top: none;
+}
+
+#modalInfo h2::before,
+#modalInfo h3::before,
+.modal h2::before,
+.modal h3::before,
+.modal-header h2::before,
+.modal-header h3::before {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .header,
+  .footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+}
