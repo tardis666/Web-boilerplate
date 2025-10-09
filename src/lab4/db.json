@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "id": "Seed",
+      "full_name": "вітя бублік",
+      "course": "Mathematics",
+      "country": "USA",
+      "email": "vitatop@best.com",
+      "phone": "+3806766472",
+      "b_date": "1678-08-03",
+      "gender": "Female",
+      "bgcolor": "#ee00ff",
+      "note": "hello"
+    }
+  ]
+}
