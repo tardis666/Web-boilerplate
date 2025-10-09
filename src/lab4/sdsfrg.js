@@ -1,42 +1,5 @@
 import { formatUsers } from './helpers.js';
 
-// ---------------- скільки днів до наступного ДН ----------------
-function daysUntilNextBirthday(birthDateString) {
-  if (!birthDateString) return null;
-
-  const birthDate = dayjs(birthDateString);
-  if (!birthDate.isValid()) return null; 
-
-  const today = dayjs();
-  let nextBirthday = birthDate.year(today.year());
-
-  // Якщо день народження цього року вже минув — переносимо на наступний рік
-  if (nextBirthday.isBefore(today, "day")) {
-    nextBirthday = nextBirthday.add(1, "year");
-  }
-
-  const daysLeft = nextBirthday.diff(today, "day");
-  return daysLeft;
-}
-
-// ----------------  ДН у модалці ----------------
-function showBirthdayLeft(teacher) {
-  const infoBirthdayLeft = document.getElementById("infoBirthdayLeft");
-  if (!infoBirthdayLeft) return;
-
-  const daysLeft = daysUntilNextBirthday(teacher.b_date);
-
-  if (daysLeft === null) {
-    infoBirthdayLeft.textContent = "";
-  } else if (daysLeft === 0) {
-    infoBirthdayLeft.textContent = "🎉 HAPPY BIRTHDAY!";
-  } else if (daysLeft === 1) {
-    infoBirthdayLeft.textContent = "🎂 TOMORROW IS A BIG DAY";
-  } else {
-    infoBirthdayLeft.textContent = `🎂 ${daysLeft} days to birthday`;
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.querySelector('.teacher-list');
   const filterCountry = document.getElementById('filterCountry');
@@ -62,12 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch("https://randomuser.me/api/?results=50");
       const data = await res.json();
       let randomTeachers = formatUsers(data.results, []);
-      randomTeachers.forEach(t => {
-        t.favorite = false;
-        t.b_date = t.b_date ? dayjs(t.b_date).format('YYYY-MM-DD') : t.dob?.date ? dayjs(t.dob.date).format('YYYY-MM-DD') : null;
-        t.age = calculateAge(t.b_date) || 0;  
-      });
-
+      randomTeachers.forEach(t => t.favorite = false);
 
       // 2.  локальнi з json-server
       const resLocal = await fetch("http://localhost:3001/users");
@@ -77,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ...t,
         favorite: t.favorite ?? false,
         picture_large: t.picture_large || "",
-        age: calculateAge(t.b_date || t.birthdate),
-        b_date: t.b_date ? dayjs(t.b_date).format('YYYY-MM-DD') : t.birthdate ? dayjs(t.birthdate).format('YYYY-MM-DD') : null
+        age: calculateAge(t.age)
       }));
+
 
       // 3.  (локальні + випадкові)
       teachers = [...localTeachers, ...randomTeachers];
@@ -88,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
       populateFilters(teachers);
       filteredUsers = [...teachers];
       render(filteredUsers);
-      renderPivotTable(filteredUsers);
+      updateFavoritesList();
     } catch (err) {
       console.error("Помилка при завантаженні користувачів:", err);
     }
@@ -113,11 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       populateFilters(teachers);                  //  селекти
       applyFiltersAndSearch();                    // рендер карток
 
-      renderPivotTable(filteredUsers);                 // рендер таблиці
-      if (pivot) {
-        pivot.updateData({ data: filteredUsers });
-      }
-
+      renderTable(filteredUsers);                  // рендер таблиці
       updateFavoritesList();                       //  фаворити
     } catch (err) {
       console.error('Помилка при завантаженні користувачів', err);
@@ -142,8 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
       div.dataset.favorite = u.favorite;
       div.dataset.photo = u.picture_large;
       div.dataset.email = u.email;
-      div.dataset.b_date = u.b_date; // щоб модалка бачила дату
-
       div.dataset.phone = u.phone;
       div.dataset.desc = u.note || "No description";
       div.dataset.bgcolor = u.bgcolor || "#000";
@@ -207,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.dataset.speciality = t.course;
       card.dataset.country = t.country;
       card.dataset.age = t.age;
-      card.dataset.b_date = t.b_date; // щоб модалка бачила дату
       card.dataset.gender = t.gender;
       card.dataset.favorite = t.favorite;
       card.dataset.photo = t.picture_large;
@@ -323,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------- фільтри ----------------
   function populateFilters(users) {
     function fillSelect(select, values) {
-      values = _.sortBy(_.uniq(values)); // лоадаш uniq + sort
+      values = _.sortBy(_.uniq(values)); // lodash uniq + sort
       select.innerHTML = '';
       select.appendChild(new Option('All', ''));
       values.forEach(v => select.appendChild(new Option(v, v)));
@@ -337,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---------------- фільтри + пошук----------------
   function applyFiltersAndSearch() {
-    let filtered = _.clone(teachers); // лоадаш clone
+    let filtered = _.clone(teachers); // lodash clone
 
     if (filterCountry.value) filtered = _.filter(filtered, { country: filterCountry.value });
     if (filterAge.value) filtered = _.filter(filtered, t => t.age === parseInt(filterAge.value));
@@ -356,12 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filteredUsers = filtered;
     render(filteredUsers);
-    // Якщо pivot створено та таб "Table" активний — оновити його
-    const isTableActive = document.getElementById('tabTable')?.classList.contains('active');
-    if (pivot && isTableActive) {
-      pivot.updateData({ data: filteredUsers });
-    }
-
   }
 
 
@@ -386,11 +331,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // ---------------- DOM ----------------
 const teacherList = document.querySelector(".teacher-list");
 const closeButtons = document.querySelectorAll(".close-modal");
+const tableBody = document.getElementById("tableBody");
+const pageInfo = document.getElementById("pageInfo");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
 // ---------------- конст ----------------
 let allUsers = [];
 let filteredUsers = [];
-let pivot = null;
+let favorites = [];
+let currentPage = 1;
+const rowsPerPage = 10;
 
 // ---------------- викачка тіл ----------------
 async function loadUsers() {
@@ -403,44 +354,56 @@ async function loadUsers() {
 }
 
 loadUsers();
-// ---------------- WebDataRocks pivot (таблиця) ----------------
-function renderPivotTable(users) {
-  const pivotData = users.map(u => {
-    const { id, b_date, coordinates, bg_color, bgcolor, title, city, favorite, picture_large, picture_thumbnail, timezone, postcode, state, ...rest } = u; // прибираємо id і b_date
-    return rest;
+
+
+
+// ---------------- Render Table ----------------
+function renderTable(users) {
+  tableBody.innerHTML = "";
+  const totalPages = Math.ceil(users.length / rowsPerPage);
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const slice = users.slice(start, end);
+
+  slice.forEach((u, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${u.full_name}</td>
+      <td>${u.age}</td>
+      <td>${u.country}</td>
+      <td>${u.gender}</td>
+      <td>${u.course}</td>
+    `;
+    tableBody.appendChild(row);
   });
 
-  // якщо ще не створений — створюємо
-  if (!pivot) {
-    pivot = new WebDataRocks({
-      container: "#pivotContainer",
-      toolbar: true,
-      height: 520,
-      report: {
-        dataSource: { data: pivotData },
-        slice: {
-          rows: [
-            { uniqueName: "full_name", caption: "Name" },
-            { uniqueName: "age", caption: "Age" },
-            { uniqueName: "country", caption: "Nationality" },
-            { uniqueName: "gender", caption: "Gender" },
-            { uniqueName: "course", caption: "Speciality" },
-            { uniqueName: "note", caption: "Description" },
-            { uniqueName: "email", caption: "E-mail" },
-            { uniqueName: "phone", caption: "Mobile", type: "string" }
-          ],
-        },
-        options: {
-          grid: { type: "flat" },
-          showGrandTotals: false,
-          showTotals: false
-        }
-      }
-    });
-  } else {
-    pivot.updateData({ data: pivotData });
-  }
+
+
+  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  prevBtn.disabled = currentPage === 1;
+  nextBtn.disabled = currentPage === totalPages;
 }
+
+
+document.querySelectorAll("th[data-field]").forEach(th => {
+  th.addEventListener("click", () => {
+    const field = th.dataset.field;
+
+    if (currentSort.field === field) {
+      currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      currentSort.field = field;
+      currentSort.direction = "asc";
+    }
+    // -сортет у th
+    document.querySelectorAll("th[data-field]").forEach(t => t.classList.remove("sorted"));
+    // на обрна
+    th.classList.add("sorted");
+
+    filteredUsers = _.orderBy(filteredUsers, [currentSort.field], [currentSort.direction]);
+    renderTable(filteredUsers);
+  });
+});
 
 
 // ---------------- модал ----------------
@@ -448,15 +411,11 @@ async function openModal(card) {
   document.getElementById("infoName").innerText = card.dataset.name;
   document.getElementById("infoSpeciality").innerText = card.dataset.speciality;
   document.getElementById("infoCountry").innerText = card.dataset.country;
+  const age = calculateAge(card.dataset.age) || card.dataset.age;
+  document.getElementById("infoMeta").innerText = age + " yrs, " + (card.dataset.gender || "—");
   document.getElementById("infoEmail").innerHTML = card.dataset.email ? `<a href="mailto:${card.dataset.email}">${card.dataset.email}</a>` : "";
   document.getElementById("infoPhone").innerHTML = card.dataset.phone ? `<a href="tel:${card.dataset.phone}">${card.dataset.phone}</a>` : "";
   document.getElementById("infoDesc").innerText = card.dataset.desc || 'No description provided.';
-  const teacher = {
-    b_date: card.dataset.b_date || null
-  };
-  const age = calculateAge(teacher.b_date); // число років із дати
-  document.getElementById("infoMeta").innerText = age + " yrs, " + (card.dataset.gender || "—");
-  showBirthdayLeft(teacher);
 
   modalInfo.classList.add("active");
   document.body.classList.add("modal-open");
@@ -534,6 +493,17 @@ teacherList.addEventListener("click", (e) => {
   openModal(card);
 });
 
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+
 // Close modal
 closeButtons.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -551,10 +521,48 @@ document.querySelectorAll(".modal-overlay").forEach(overlay => {
   });
 });
 
+// ---------------- пагінация ----------------
+prevBtn.addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderTable(filteredUsers);
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderTable(filteredUsers);
+  }
+});
+
+
+let currentSort = { field: null, direction: "asc" };
+
+document.querySelectorAll("th[data-field]").forEach(th => {
+  th.addEventListener("click", () => {
+    const field = th.dataset.field;
+
+    // міняємо напрямок, якщо клацаємо по тій самій колонці
+    if (currentSort.field === field) {
+      currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      currentSort.field = field;
+      currentSort.direction = "asc";
+    }
+
+    filteredUsers = _.orderBy(filteredUsers, [currentSort.field], [currentSort.direction]);
+    renderTable(filteredUsers);
+  });
+});
+
+
+
 
 // ---------------- рендер для фільтров ----------------
 function render() {
-  renderPivotTable(filteredUsers);
+  renderTable(filteredUsers);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -587,12 +595,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(form);
     const teacher = Object.fromEntries(formData.entries());
-
-    // уніфікація
-    if (teacher.b_date) {
-      teacher.b_date = dayjs(teacher.b_date).format('YYYY-MM-DD');
-    }
-
 
     // Валіднація (мінімально)
     if (!teacher.full_name.trim() || !teacher.email.trim()) {
@@ -630,17 +632,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 });
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2000);
-}
-
 // ініціал фотка
 function getInitials(fullName) {
   const names = fullName.trim().split(" ");
@@ -718,7 +709,7 @@ if (phoneInput) {
   });
 
 
-  // ---------------- чарт ----------------
+  // ---------------- Chart ----------------
   const tabTable = document.getElementById("tabTable");
   const tabCountry = document.getElementById("tabCountry");
   const tabAge = document.getElementById("tabAge");
@@ -734,35 +725,17 @@ if (phoneInput) {
       tab.classList.add('active');
 
       if (tab === tabTable) {
-        // таблиця
         tableContainer.style.display = 'block';
         chartContainer.style.display = 'none';
-        renderPivotTable(filteredUsers);
-      }
-
-      else if (tab === tabCountry) {
-        // графік по країнах
+      } else {
         tableContainer.style.display = 'none';
         chartContainer.style.display = 'block';
-        renderChartByCountry(filteredUsers);
-      }
-
-      else if (tab === tabAge) {
-        // графік по віку
-        tableContainer.style.display = 'none';
-        chartContainer.style.display = 'block';
-        renderChartByAge(filteredUsers);
-      }
-
-      else if (tab === tabCourse) {
-        // графік по курсах
-        tableContainer.style.display = 'none';
-        chartContainer.style.display = 'block';
-        renderChartByCourse(filteredUsers);
+        if (tab === tabCountry) renderChartByCountry(filteredUsers);
+        if (tab === tabAge) renderChartByAge(filteredUsers);
+        if (tab === tabCourse) renderChartByCourse(filteredUsers);
       }
     });
   });
-
 
   let teachersChart;
 
@@ -792,15 +765,12 @@ if (phoneInput) {
 
     const ageGroups = { "20-29": 0, "30-39": 0, "40-49": 0, "50+": 0 };
     users.forEach(u => {
-      const age = Number(u.age); 
-      if (!isNaN(age)) {
-        if (age < 30) ageGroups["20-29"]++;
-        else if (age < 40) ageGroups["30-39"]++;
-        else if (age < 50) ageGroups["40-49"]++;
-        else ageGroups["50+"]++;
-      }
+      const age = parseInt(u.age);
+      if (age < 30) ageGroups["20-29"]++;
+      else if (age < 40) ageGroups["30-39"]++;
+      else if (age < 50) ageGroups["40-49"]++;
+      else ageGroups["50+"]++;
     });
-
 
     if (teachersChart) teachersChart.destroy();
 

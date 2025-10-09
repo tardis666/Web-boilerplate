@@ -1,25 +1,13 @@
 {
   "users": [
     {
-      "id": "5eed",
-      "full_name": "Papa karlo",
-      "course": "English",
-      "country": "USA",
-      "email": "8767@mail.occ",
-      "phone": "774555648393933948575",
-      "age": "2003-08-03",
-      "gender": "Male",
-      "bgcolor": "#f505d5",
-      "note": "papik"
-    },
-    {
-      "id": "f2f2",
+      "id": "Seed",
       "full_name": "вітя бублік",
       "course": "Mathematics",
       "country": "USA",
       "email": "vitatop@best.com",
       "phone": "+3806766472",
-      "age": "1678-08-03",
+      "b_date": "1678-08-03",
       "gender": "Female",
       "bgcolor": "#ee00ff",
       "note": "hello"

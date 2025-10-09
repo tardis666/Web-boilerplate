@@ -80,6 +80,70 @@ html {
   color: #d9534f;
 }
 
+ /* стиль табів статистики*/
+
+.small-chart {
+  width: 350px !important;   /* бажана ширина */
+  height: 350px !important;  /* бажана висота */
+  margin: 0 auto;            /* центрує графік */
+  display: block;            /* потрібно для margin auto */
+}
+
+.statistics-tabs .btn {
+  border: 1px solid #d9534f;
+  background: none;
+  color: #d9534f;
+  font-weight: bold;
+  padding: 8px 16px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+#teacherTable .btn-add {
+  width: auto;       
+  height: auto;     
+  padding: 10px 16px; 
+  font-size: 14px;   
+}
+/* Контейнер для всіх графіків */
+.stats-wrapper {
+  display: flex;
+  flex-direction: column;    /* розташування зверху вниз */
+  align-items: center;       /* горизонтальне центрування */
+  justify-content: center;   /* вертикальне центрування, якщо потрібно */
+  width: 100%;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;   /* центр кнопок у рядку */
+  gap: 10px;                 /* відстань між кнопками */
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  width: 600px;        /* фіксована ширина */
+  height: 600px;       /* фіксована висота */
+  max-width: 90vw;     /* адаптивно */
+  max-height: 600px;
+  display: flex;
+  align-items: center;   /* центр по вертикалі всередині контейнера */
+  justify-content: center; /* центр по горизонталі всередині контейнера */
+}
+
+.statistics-tabs .btn:hover {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.statistics-tabs .btn.active {
+  background-color: #d9534f;
+  color: #fff;
+}
+/* стиль табів статистики*/
+
 /* тост */
 .toast {
   position: fixed;

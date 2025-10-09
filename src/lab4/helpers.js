@@ -58,8 +58,7 @@ export function formatUsers(randomUsers, additionalUsers) {
         description: user.location?.timezone?.description || "Unknown"
       },
       email: user.email || "unknown@example.com",
-      b_date: user.dob?.date || "",
-      age: Number(user.dob?.age) || 0,
+      b_date: user.dob?.date ? user.dob.date.split("T")[0] : "",
       phone: user.phone || "000-000-0000",
       picture_large: user.picture?.large || "",
       picture_thumbnail: user.picture?.thumbnail || "",
